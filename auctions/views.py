@@ -61,3 +61,39 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+def create_listing(request):
+    if request.method == "POST":
+        #Get form data
+        title = request.POST["title"]
+        description = request.POST["description"]
+        starting_bid = request.POST["starting_bid"]
+        image_url = request.POST["image_url"]
+        category = request.POST["category"]
+
+        #Validate form data
+        if not title or not description or not starting_bid:
+            return render(request, "auctions/create.html", {
+                "message": "Title, description, and starting bid are required."
+            })
+        
+        try:
+            starting_bid = float(starting_bid)
+            if starting_bid <= 0:
+                raise ValueError
+        except ValueError:
+            return render(request, "auctions/create.html", {
+                "message": "Starting bid must be a positive number."
+            })
+        
+        #Create new listing
+        Listing = Listing(
+            title=title,
+            description=description,
+            starting_bid=starting_bid,
+            image_url=image_url,
+            category=category,
+            owner=request.user
+        )
+        Listing.save()
+        return HttpResponseRedirect(reverse("index"))
