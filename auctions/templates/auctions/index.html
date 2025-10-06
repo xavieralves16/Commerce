@@ -5,9 +5,7 @@
     {% if listings %}
         <ul>
             {% for listing in listings %}
-                <li>
-                    <a href="{% url 'listing' listing.id %}">{{ listing.title }}</a> - Starting Bid: ${{ listing.starting_bid }}
-                </li>
+                <li>{{ listing.title }}</a> - Starting Bid: ${{ listing.starting_bid }}</li>
             {% endfor %}
         </ul>
     {% else %}
