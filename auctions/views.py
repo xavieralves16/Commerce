@@ -97,3 +97,5 @@ def create_listing(request):
         )
         Listing.save()
         return HttpResponseRedirect(reverse("index"))
+    else:
+        return render(request, "auctions/create.html")
