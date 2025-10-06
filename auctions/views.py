@@ -8,7 +8,7 @@ from .models import User, Listing
 
 
 def index(request):
-    listings = Listing.objects.filter(active=True)
+    listings = Listing.objects.filter(is_active=True)
     return render(request, "auctions/index.html", {
         "listings": listings
     })
