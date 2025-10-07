@@ -1,0 +1,27 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+{% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+{% endif %}
+<h2>Your Watchlist</h2>
+
+{% if watchlist %}
+    <ul>
+    {% for listing in watchlist %}
+        <li>
+            <a href="{% url 'listing' listing.id %}">{{ listing.title }}</a> - ${{ listing.current_price }}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Your watchlist is empty.</p>
+{% endif %}
+
+{% endblock %}
