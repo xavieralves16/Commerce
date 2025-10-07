@@ -10,7 +10,9 @@
           {% if listing.image_url %}
             <img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="200"><br>
           {% endif %}
-          <strong>{{ listing.title }}</strong><br>
+          <a href="{% url 'listing' listing.id %}">
+            <strong>{{ listing.title }}</strong>
+          </a><br>
           {{ listing.description }}<br>
           Current Price: ${{ listing.current_price }}
         </li>
