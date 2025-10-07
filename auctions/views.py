@@ -191,11 +191,19 @@ def watchlist_view(request):
         "watchlist": watchlist
     })
 
-def categories_view(request):
-    categories = Listing.CATEGORY_CHOICES
-    return render(request, "auctions/categories.html", {
-        "categories": categories
-    })
+def categories_view(request, category_name=None):
+    if category_name:
+        listings = Listing.objects.filter(is_active=True, category=category_name)
+        return render(request, "auctions/category_listings.html", {
+            "category": category_name,
+            "listings": listings
+        })
+    else:
+        categories = Listing.objects.values_list('category', flat=True).distinct()
+        categories = [c for c in categories if c]  
+        return render(request, "auctions/categories.html", {
+            "categories": categories
+        })
             
 
 
