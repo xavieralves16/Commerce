@@ -1,10 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
+from django.contrib import messages
 
-from .models import User, Listing
+from .models import User, Listing, Bid, Comment
 
 
 def index(request):
@@ -102,3 +103,82 @@ def create_listing(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/create.html")
+    
+def listing_view(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+    user = request.user
+
+    current_bid = listing.current_price
+
+    in_watchlist = user.is_authenticated and listing in user.watchlist.all()
+
+    if request.method == "POST":
+        if not user.is_authenticated:
+            messages.error(request, "You must be logged in to perform this action.")
+            return redirect("login")
+
+        #Add or remove from watchlist
+        if "watchlist" in request.POST:
+            if in_watchlist:
+                user.watchlist.remove(listing)
+                messages.info(request, "Removed from watchlist.")
+            else:
+                user.watchlist.add(listing)
+                messages.info(request, "Added to watchlist.")
+            return redirect("listing", listing_id=listing.id)
+        
+        # Place a bid
+        elif "bid" in request.POST:
+            try:
+                bid_amount = float(request.POST["bid_amount"])
+            except ValueError:
+                messages.error(request, "Invalid bid amount.")
+                return redirect("listing", listing_id=listing.id)
+            
+            if bid_amount <= listing.current_price:
+                messages.error(request, "Bid must be higher than current price.")
+                return redirect("listing", listing_id=listing.id)
+            
+            else:
+                Bid.objects.create(
+                    amount=bid_amount,
+                    bidder=user,
+                    listing=listing
+                )
+                messages.success(request, "Bid placed successfully.")
+                return redirect("listing", listing_id=listing.id)
+        
+        # Close the auction
+        elif "close" in request.POST and user == listing.owner:
+            if current_bid:
+                listing.winner = current_bid.bidder
+            listing.is_active = False
+            listing.save()
+            messages.info(request, "Auction closed.")
+            return redirect("listing", listing_id=listing.id)
+        
+        # Add a comment
+        elif "comment" in request.POST:
+            content = request.POST["content"]
+            if content:
+                Comment.objects.create(
+                    content=content,
+                    commenter=user,
+                    listing=listing
+                )
+                messages.success(request, "Comment added.")
+            else:
+                messages.error(request, "Comment cannot be empty.")
+            return redirect("listing", listing_id=listing.id)
+        
+        coments = listing.comments.all().order_by('-created_at')
+
+        return render(request, "auctions/listing.html", {
+            listing: listing,
+            "current_price": listing.current_price,
+            "in_watchlist": in_watchlist,
+            "comments": coments
+        })
+            
+
+
