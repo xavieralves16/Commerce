@@ -171,14 +171,14 @@ def listing_view(request, listing_id):
                 messages.error(request, "Comment cannot be empty.")
             return redirect("listing", listing_id=listing.id)
         
-        coments = listing.comments.all().order_by('-created_at')
+    coments = listing.comments.all().order_by('-created_at')
 
-        return render(request, "auctions/listing.html", {
-            listing: listing,
-            "current_price": listing.current_price,
-            "in_watchlist": in_watchlist,
-            "comments": coments
-        })
+    return render(request, "auctions/listing.html", {
+        listing: listing,
+        "current_price": listing.current_price,
+        "in_watchlist": in_watchlist,
+        "comments": coments
+    })
             
 
 
