@@ -15,8 +15,14 @@ class Listing(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="won_listings", null=True, blank=True)
+    
     def __str__ (self):
         return f"{self.title} ({self.id})"
+    
+    @property
+    def current_price(self):
+        highest_bid = self.bids.order_by('-amount').first()
+        return highest_bid.amount if highest_bid else self.starting_bid
     
 class Bid(models.Model):
     amount = models.FloatField()
@@ -24,7 +30,7 @@ class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="bids")
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return f"{self.amout} by {self.bidder} on {self.listing}"
+        return f"{self.amount} by {self.bidder} on {self.listing}"
     
 class Comment(models.Model):
     content = models.CharField(max_length=256)
