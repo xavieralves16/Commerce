@@ -180,6 +180,16 @@ def listing_view(request, listing_id):
         "in_watchlist": in_watchlist,
         "comments": coments
     })
+
+def watchlist_view(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You must be logged in to view your watchlist.")
+        return redirect("login")
+    
+    watchlist = request.user.watchlist.all()
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": watchlist
+    })
             
 
 
