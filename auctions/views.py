@@ -190,6 +190,12 @@ def watchlist_view(request):
     return render(request, "auctions/watchlist.html", {
         "watchlist": watchlist
     })
+
+def categories_view(request):
+    categories = Listing.CATEGORY_CHOICES
+    return render(request, "auctions/categories.html", {
+        "categories": categories
+    })
             
 
 
