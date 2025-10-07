@@ -97,7 +97,8 @@ def create_listing(request):
             starting_bid=starting_bid,
             image_url=image_url,
             category=category,
-            owner=request.user
+            owner=request.user,
+            is_active=True
         )
         listing.save()
         return HttpResponseRedirect(reverse("index"))
@@ -174,7 +175,7 @@ def listing_view(request, listing_id):
     coments = listing.comments.all().order_by('-created_at')
 
     return render(request, "auctions/listing.html", {
-        listing: listing,
+        "listing": listing,
         "current_price": listing.current_price,
         "in_watchlist": in_watchlist,
         "comments": coments
