@@ -160,7 +160,7 @@ def listing_view(request, listing_id):
         
         # Add a comment
         elif "comment" in request.POST:
-            content = request.POST["content"]
+            content = request.POST["comment_content"]
             if content:
                 Comment.objects.create(
                     content=content,
